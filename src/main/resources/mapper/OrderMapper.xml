@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.warehouse.deliverydemo.mapper.OrderMapper">
+    <insert id="insert" parameterType="com.warehouse.deliverydemo.entity.Order" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO `order` (order_no, user_id, merchant_id, address_id, total_amount, status, payment_method, payment_time, shipping_address, remark, created_at, updated_at)
+        VALUES (#{orderNo}, #{userId}, #{merchantId}, #{addressId}, #{totalAmount}, #{status}, #{paymentMethod}, #{paymentTime}, #{shippingAddress}, #{remark}, NOW(), NOW())
+    </insert>
+    
+    <select id="findById" resultType="com.warehouse.deliverydemo.entity.Order">
+        SELECT * FROM `order` WHERE id = #{id}
+    </select>
+    
+    <select id="findByOrderNo" resultType="com.warehouse.deliverydemo.entity.Order">
+        SELECT * FROM `order` WHERE order_no = #{orderNo}
+    </select>
+    
+    <select id="findByUserId" resultType="com.warehouse.deliverydemo.entity.Order">
+        SELECT * FROM `order` WHERE user_id = #{userId} ORDER BY created_at DESC LIMIT #{offset}, #{limit}
+    </select>
+    
+    <select id="countByUserId" resultType="java.lang.Integer">
+        SELECT COUNT(*) FROM `order` WHERE user_id = #{userId}
+    </select>
+    
+    <select id="findByMerchantId" resultType="com.warehouse.deliverydemo.entity.Order">
+        SELECT o.*, u.username as userName
+        FROM `order` o
+        LEFT JOIN user u ON o.user_id = u.id
+        WHERE o.merchant_id = #{merchantId}
+        ORDER BY o.created_at DESC
+        LIMIT #{offset}, #{limit}
+    </select>
+    
+    <select id="countByMerchantId" resultType="java.lang.Integer">
+        SELECT COUNT(*) FROM `order` WHERE merchant_id = #{merchantId}
+    </select>
+    
+    <update id="update" parameterType="com.warehouse.deliverydemo.entity.Order">
+        UPDATE `order` SET
+        status = #{status},
+        payment_method = #{paymentMethod},
+        payment_time = #{paymentTime},
+        updated_at = NOW()
+        WHERE id = #{id}
+    </update>
+</mapper>

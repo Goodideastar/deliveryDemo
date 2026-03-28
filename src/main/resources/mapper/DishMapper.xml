@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.warehouse.deliverydemo.mapper.DishMapper">
+    <select id="findByCategoryId" resultType="com.warehouse.deliverydemo.entity.Dish">
+        SELECT * FROM dish WHERE category_id = #{categoryId} AND status = 1 ORDER BY sort ASC
+    </select>
+    
+    <select id="findByCategoryIdAndMerchantId" resultType="com.warehouse.deliverydemo.entity.Dish">
+        SELECT * FROM dish WHERE category_id = #{categoryId} AND merchant_id = #{merchantId} AND status = 1 ORDER BY sort ASC
+    </select>
+    
+    <select id="findByMerchantId" resultType="com.warehouse.deliverydemo.entity.Dish">
+        SELECT * FROM dish WHERE merchant_id = #{merchantId} AND status = 1 ORDER BY sort ASC
+    </select>
+    
+    <select id="search" resultType="com.warehouse.deliverydemo.entity.Dish">
+        SELECT * FROM dish WHERE merchant_id = #{merchantId} AND status = 1
+        <if test="keyword != null and keyword != ''">
+            AND name LIKE CONCAT('%', #{keyword}, '%')
+        </if>
+        <if test="minPrice != null">
+            AND price >= #{minPrice}
+        </if>
+        <if test="maxPrice != null">
+            AND price &lt;= #{maxPrice}
+        </if>
+        ORDER BY sort ASC LIMIT #{offset}, #{limit}
+    </select>
+    
+    <select id="countSearch" resultType="java.lang.Integer">
+        SELECT COUNT(*) FROM dish WHERE merchant_id = #{merchantId} AND status = 1
+        <if test="keyword != null and keyword != ''">
+            AND name LIKE CONCAT('%', #{keyword}, '%')
+        </if>
+        <if test="minPrice != null">
+            AND price >= #{minPrice}
+        </if>
+        <if test="maxPrice != null">
+            AND price &lt;= #{maxPrice}
+        </if>
+    </select>
+    
+    <select id="findById" resultType="com.warehouse.deliverydemo.entity.Dish">
+        SELECT * FROM dish WHERE id = #{id}
+    </select>
+    
+    <insert id="insert" parameterType="com.warehouse.deliverydemo.entity.Dish">
+        INSERT INTO dish (name, description, price, image, category_id, merchant_id, status, sort, stock, created_at, updated_at)
+        VALUES (#{name}, #{description}, #{price}, #{image}, #{categoryId}, #{merchantId}, #{status}, #{sort}, #{stock}, NOW(), NOW())
+    </insert>
+    
+    <update id="update" parameterType="com.warehouse.deliverydemo.entity.Dish">
+        UPDATE dish SET
+            name = #{name},
+            description = #{description},
+            price = #{price},
+            image = #{image},
+            category_id = #{categoryId},
+            status = #{status},
+            sort = #{sort},
+            updated_at = NOW()
+        WHERE id = #{id}
+    </update>
+    
+    <delete id="delete" parameterType="java.lang.Long">
+        DELETE FROM dish WHERE id = #{id}
+    </delete>
+    
+    <update id="updateStock" parameterType="map">
+        UPDATE dish SET
+            stock = stock - #{quantity},
+            updated_at = NOW()
+        WHERE id = #{id} AND stock >= #{quantity}
+    </update>
+</mapper>

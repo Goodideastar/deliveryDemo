@@ -1,0 +1,9 @@
+-- 为merchant表添加支付相关字段
+ALTER TABLE merchant ADD COLUMN wechat_app_id VARCHAR(100) DEFAULT NULL COMMENT '微信支付AppID';
+ALTER TABLE merchant ADD COLUMN wechat_mch_id VARCHAR(100) DEFAULT NULL COMMENT '微信支付商户ID';
+ALTER TABLE merchant ADD COLUMN wechat_api_key VARCHAR(255) DEFAULT NULL COMMENT '微信支付API密钥';
+ALTER TABLE merchant ADD COLUMN wechat_notify_url VARCHAR(255) DEFAULT NULL COMMENT '微信支付回调URL';
+ALTER TABLE merchant ADD COLUMN alipay_app_id VARCHAR(100) DEFAULT NULL COMMENT '支付宝AppID';
+ALTER TABLE merchant ADD COLUMN alipay_private_key TEXT DEFAULT NULL COMMENT '支付宝私钥';
+ALTER TABLE merchant ADD COLUMN alipay_public_key TEXT DEFAULT NULL COMMENT '支付宝公钥';
+ALTER TABLE merchant ADD COLUMN alipay_gateway_url VARCHAR(255) DEFAULT NULL COMMENT '支付宝网关URL';

@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.warehouse.deliverydemo.mapper.MerchantMapper">
+    <select id="findAll" resultType="com.warehouse.deliverydemo.entity.Merchant">
+        SELECT * FROM merchant WHERE status = 1 ORDER BY sales DESC, rating DESC LIMIT #{offset}, #{limit}
+    </select>
+    
+    <select id="countAll" resultType="java.lang.Integer">
+        SELECT COUNT(*) FROM merchant WHERE status = 1
+    </select>
+    
+    <select id="findById" resultType="com.warehouse.deliverydemo.entity.Merchant">
+        SELECT * FROM merchant WHERE id = #{id}
+    </select>
+    
+    <select id="search" resultType="com.warehouse.deliverydemo.entity.Merchant">
+        SELECT * FROM merchant WHERE status = 1 AND name LIKE CONCAT('%', #{keyword}, '%') ORDER BY sales DESC, rating DESC LIMIT #{offset}, #{limit}
+    </select>
+    
+    <select id="countSearch" resultType="java.lang.Integer">
+        SELECT COUNT(*) FROM merchant WHERE status = 1 AND name LIKE CONCAT('%', #{keyword}, '%')
+    </select>
+    
+    <select id="findByUsername" resultType="com.warehouse.deliverydemo.entity.Merchant">
+        SELECT * FROM merchant WHERE username = #{username}
+    </select>
+    
+    <select id="findByPhone" resultType="com.warehouse.deliverydemo.entity.Merchant">
+        SELECT * FROM merchant WHERE phone = #{phone}
+    </select>
+    
+    <select id="findByEmail" resultType="com.warehouse.deliverydemo.entity.Merchant">
+        SELECT * FROM merchant WHERE email = #{email}
+    </select>
+    
+    <insert id="insert" parameterType="com.warehouse.deliverydemo.entity.Merchant">
+        INSERT INTO merchant (username, password, phone, email, name, address, description, logo, rating, sales, status, business_status, wechat_app_id, wechat_mch_id, wechat_api_key, wechat_notify_url, alipay_app_id, alipay_private_key, alipay_public_key, alipay_gateway_url, created_at, updated_at)
+        VALUES (#{username}, #{password}, #{phone}, #{email}, #{name}, #{address}, #{description}, #{logo}, #{rating}, #{sales}, #{status}, #{businessStatus}, #{wechatAppId}, #{wechatMchId}, #{wechatApiKey}, #{wechatNotifyUrl}, #{alipayAppId}, #{alipayPrivateKey}, #{alipayPublicKey}, #{alipayGatewayUrl}, NOW(), NOW())
+    </insert>
+    
+    <update id="updateBusinessStatus">
+        UPDATE merchant SET business_status = #{status}, updated_at = NOW() WHERE id = #{id}
+    </update>
+    
+    <update id="updateSales">
+        UPDATE merchant SET sales = #{sales}, updated_at = NOW() WHERE id = #{id}
+    </update>
+
+    <update id="update" parameterType="com.warehouse.deliverydemo.entity.Merchant">
+        UPDATE merchant 
+        SET name = #{name}, 
+            address = #{address}, 
+            phone = #{phone}, 
+            email = #{email}, 
+            description = #{description}, 
+            logo = #{logo}, 
+            wechat_app_id = #{wechatAppId}, 
+            wechat_mch_id = #{wechatMchId}, 
+            wechat_api_key = #{wechatApiKey}, 
+            wechat_notify_url = #{wechatNotifyUrl}, 
+            alipay_app_id = #{alipayAppId}, 
+            alipay_private_key = #{alipayPrivateKey}, 
+            alipay_public_key = #{alipayPublicKey}, 
+            alipay_gateway_url = #{alipayGatewayUrl}, 
+            updated_at = NOW() 
+        WHERE id = #{id}
+    </update>
+</mapper>

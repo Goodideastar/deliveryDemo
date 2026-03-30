@@ -1,5 +1,6 @@
 package com.warehouse.deliverydemo.controller;
 
+import com.warehouse.deliverydemo.common.Result;
 import com.warehouse.deliverydemo.entity.User;
 import com.warehouse.deliverydemo.service.UserService;
 import org.slf4j.Logger;
@@ -9,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
-import java.util.HashMap;
+
 import java.util.Map;
 
 @RestController
@@ -21,12 +22,11 @@ public class UserController {
     private UserService userService;
 
     @PostMapping("/register")
-    public Map<String, Object> register(@RequestBody Map<String, Object> registerData) {
+    public Result<?> register(@RequestBody Map<String, Object> registerData) {
         String username = (String) registerData.get("username");
         String phone = (String) registerData.get("phone");
         String role = (String) registerData.get("role");
         logger.info("用户注册，用户名: {}, 手机号: {}, 角色: {}", username, phone, role);
-        Map<String, Object> result = new HashMap<>();
         try {
             User user = new User();
             user.setUsername(username);
@@ -37,22 +37,17 @@ public class UserController {
 
             User registeredUser = userService.register(user);
             logger.info("用户注册成功，用户ID: {}, 用户名: {}", registeredUser.getId(), registeredUser.getUsername());
-            result.put("code", 200);
-            result.put("message", "注册成功");
-            result.put("data", registeredUser);
+            return Result.success("注册成功", registeredUser);
         } catch (Exception e) {
             logger.error("用户注册失败，用户名: {}, 手机号: {}", username, phone, e);
-            result.put("code", 500);
-            result.put("message", e.getMessage());
+            return Result.serverError(e.getMessage());
         }
-        return result;
     }
 
     @PostMapping("/login")
-    public Map<String, Object> login(@RequestBody Map<String, String> loginData) {
+    public Result<?> login(@RequestBody Map<String, String> loginData) {
         String phone = loginData.get("username");
         logger.info("用户登录，手机号/用户名: {}", phone);
-        Map<String, Object> result = new HashMap<>();
         try {
             String password = loginData.get("password");
             String token = userService.login(phone, password);
@@ -63,64 +58,51 @@ public class UserController {
                 user = userService.findByUsername(phone);
             }
             logger.info("用户登录成功，用户ID: {}, 用户名: {}", user.getId(), user.getUsername());
-            result.put("code", 200);
-            result.put("message", "登录成功");
-            result.put("token", token);
-            result.put("user", user);
+            Map<String, Object> data = new java.util.HashMap<>();
+            data.put("token", token);
+            data.put("user", user);
+            return Result.success("登录成功", data);
         } catch (Exception e) {
             logger.error("用户登录失败，手机号/用户名: {}", phone, e);
-            result.put("code", 500);
-            result.put("message", e.getMessage());
+            return Result.serverError(e.getMessage());
         }
-        return result;
     }
 
     @GetMapping("/info")
-    public Map<String, Object> getInfo(@RequestAttribute("userId") Long userId) {
+    public Result<?> getInfo(@RequestAttribute("userId") Long userId) {
         logger.info("获取用户信息，用户ID: {}", userId);
-        Map<String, Object> result = new HashMap<>();
         try {
             User user = userService.findById(userId);
             logger.info("获取用户信息成功，用户ID: {}, 用户名: {}", userId, user.getUsername());
-            result.put("code", 200);
-            result.put("data", user);
+            return Result.success(user);
         } catch (Exception e) {
             logger.error("获取用户信息失败，用户ID: {}", userId, e);
-            result.put("code", 500);
-            result.put("message", e.getMessage());
+            return Result.serverError(e.getMessage());
         }
-        return result;
     }
 
     @PutMapping("/update")
-    public Map<String, Object> update(@RequestAttribute("userId") Long userId, @RequestBody User user) {
+    public Result<?> update(@RequestAttribute("userId") Long userId, @RequestBody User user) {
         logger.info("更新用户信息，用户ID: {}", userId);
-        Map<String, Object> result = new HashMap<>();
         try {
             user.setId(userId);
             userService.update(user);
             logger.info("更新用户信息成功，用户ID: {}", userId);
-            result.put("code", 200);
-            result.put("message", "更新成功");
+            return Result.success("更新成功");
         } catch (Exception e) {
             logger.error("更新用户信息失败，用户ID: {}", userId, e);
-            result.put("code", 500);
-            result.put("message", e.getMessage());
+            return Result.serverError(e.getMessage());
         }
-        return result;
     }
 
     @PostMapping("/upload/avatar")
-    public Map<String, Object> uploadAvatar(@RequestAttribute("userId") Long userId,
+    public Result<?> uploadAvatar(@RequestAttribute("userId") Long userId,
             @RequestParam("file") MultipartFile file) {
         logger.info("上传用户头像，用户ID: {}, 文件名: {}", userId, file.getOriginalFilename());
-        Map<String, Object> result = new HashMap<>();
         try {
             if (file.isEmpty()) {
                 logger.warn("上传用户头像失败，文件为空，用户ID: {}", userId);
-                result.put("code", 400);
-                result.put("message", "文件为空");
-                return result;
+                return Result.badRequest("文件为空");
             }
 
             // 生成文件名
@@ -144,14 +126,10 @@ public class UserController {
             userService.update(user);
 
             logger.info("上传用户头像成功，用户ID: {}, 保存路径: {}", userId, relativePath);
-            result.put("code", 200);
-            result.put("message", "上传成功");
-            result.put("data", relativePath);
+            return Result.success("上传成功", relativePath);
         } catch (Exception e) {
             logger.error("上传用户头像失败，用户ID: {}", userId, e);
-            result.put("code", 500);
-            result.put("message", e.getMessage());
+            return Result.serverError(e.getMessage());
         }
-        return result;
     }
 }
